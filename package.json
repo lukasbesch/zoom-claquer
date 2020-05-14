@@ -10,6 +10,7 @@
     "p5": "^1.0.0"
   },
   "scripts": {
+    "build": "cp node_modules/ml5/dist/*.min.js node_modules/p5/lib/*.min.js node_modules/p5/lib/addons/*.js public/vendor",
     "start": "./node_modules/.bin/http-server"
   }
 }
