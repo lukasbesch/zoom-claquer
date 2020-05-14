@@ -9,7 +9,9 @@ Sound classification using pre-trained custom SpeechCommands18w and p5.js
 This example uses a callback pattern to create the classifier
 === */
 
-const modelJson = 'https://storage.googleapis.com/tm-speech-commands/eye-test-sound-yining/model.json';
+// const modelJson = 'https://storage.googleapis.com/tm-speech-commands/eye-test-sound-yining/model.json';
+const modelJson = 'https://storage.googleapis.com/tm-model/ZBXwb0y3v/model.json';
+
 // Two variable to hold the label and confidence of the result
 let label;
 let confidence;
