@@ -1,0 +1,12 @@
+{
+  "name": "zoom-claquer",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Lukas Besch <connect@lukasbesch.com>",
+  "license": "MIT",
+  "dependencies": {
+    "http-server": "^0.12.3",
+    "ml5": "^0.5.0",
+    "p5": "^1.0.0"
+  }
+}
