@@ -13,7 +13,7 @@ This example uses a callback pattern to create the classifier
 const modelJson = 'https://teachablemachine.withgoogle.com/models/ZBXwb0y3v/model.json';
 
 // Min confidence to play an audio
-const confidenceThreshold = 0.55;
+const confidenceThreshold = 0.95;
 
 // Two variable to hold the label and confidence of the result
 let label;
@@ -30,6 +30,10 @@ let audioIn;
 
 const actionMapping = {
   _background_noise_: [
+    'do nothing'
+  ],
+  conversation: [
+    'do nothing'
   ],
   bye: [
     // these are supposed to be audio files
