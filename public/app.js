@@ -10,7 +10,7 @@ This example uses a callback pattern to create the classifier
 === */
 
 // const modelJson = 'https://storage.googleapis.com/tm-speech-commands/eye-test-sound-yining/model.json';
-const modelJson = 'https://storage.googleapis.com/tm-model/ZBXwb0y3v/model.json';
+const modelJson = 'https://teachablemachine.withgoogle.com/models/ZBXwb0y3v/model.json';
 
 // Min confidence to play an audio
 const confidenceThreshold = 0.55;
@@ -19,6 +19,7 @@ const confidenceThreshold = 0.55;
 let label;
 let confidence;
 let action;
+let audioSelect;
 // Initialize a sound classifier method.
 let classifier;
 
@@ -28,11 +29,17 @@ let longPauseTimeout;
 let audioIn;
 
 const actionMapping = {
+  _background_noise_: [
+  ],
   bye: [
     // these are supposed to be audio files
     'Good bye',
     'See ya!',
     'Thanks and until next time.'
+  ],
+  laughter: [
+    'LOL',
+    '(laughs)'
   ],
   applauding: [
     'Nice!'
@@ -43,7 +50,9 @@ const actionMapping = {
  * Load the pre-trianed custom SpeechCommands18w sound classifier model.
  */
 function preload() {
-  classifier = ml5.soundClassifier(modelJson);
+  classifier = ml5.soundClassifier(modelJson, {
+    probabilityThreshold: 0.7 // probabilityThreshold is 0
+  });
 }
 
 /**
@@ -53,6 +62,12 @@ function setup() {
   noCanvas();
   // ml5 also supports using callback pattern to create the classifier
   // classifier = ml5.soundClassifier(modelJson, modelReady);
+
+  // sel.position(10, 10);
+  // sel.option('pear');
+  // sel.option('kiwi');
+  // sel.option('grape');
+  // sel.selected('kiwi');
 
   // Create 'label' and 'confidence' div to hold results
   label = createDiv('Label: ...');
@@ -86,23 +101,21 @@ function draw() {
  * @param deviceList
  */
 function gotSources(deviceList) {
+
+  audioSelect = createSelect();
+  deviceList.forEach(input => audioSelect.option(input.label))
+  audioSelect.selected(0);
+  audioSelect.changed(event => selectAudioSource(event.target.selectedIndex));
+
   if (deviceList.length < 0) {
     console.log('No audio inputs available.');
-    return;
   }
 
-  // Find the desired input source
-  const inputLabel = 'blackhole';
-  const input = deviceList
-    .findIndex(input => input.label.toLowerCase().includes(inputLabel));
-  if (! input) {
-    console.log(`Audio input ${inputLabel} is not available.`);
-    return;
-  }
+  selectAudioSource();
+}
 
-  // set the source
-  audioIn.setSource(input);
-  console.log(`set source to: ${deviceList[audioIn.currentSource].deviceId}`);
+function selectAudioSource(index = 0) {
+  audioIn.setSource(index);
 
   // start listening to input
   audioIn.start();
@@ -121,7 +134,8 @@ function gotSources(deviceList) {
 function gotResult(error, results) {
   // The results are in an array ordered by confidence.
   const {label, confidence} = results[0];
-  console.log(results);
+
+  results.forEach(result => console.log(nf(result.confidence, 0, 2), result.label));
 
   // Display error in the console
   if (error) {
@@ -133,6 +147,7 @@ function gotResult(error, results) {
   longPauseTimeout = setTimeout(longPauseCallback, 7000);
 
   let action = 'Undefined input, do nothing.';
+  console.log(Object.keys(actionMapping), (label.toLowerCase()))
   if (confidence > confidenceThreshold && Object.keys(actionMapping).includes(label.toLowerCase())) {
     // action needed!
     const actions = actionMapping[label.toLowerCase()];
