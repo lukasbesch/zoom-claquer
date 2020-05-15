@@ -10,10 +10,13 @@ This example uses a callback pattern to create the classifier
 === */
 
 // const modelJson = 'https://storage.googleapis.com/tm-speech-commands/eye-test-sound-yining/model.json';
-const modelJson = 'https://teachablemachine.withgoogle.com/models/ZBXwb0y3v/model.json';
-
-// Min confidence to play an audio
-const confidenceThreshold = 0.95;
+/**
+ * Model JSON
+ * v1: https://teachablemachine.withgoogle.com/models/ZBXwb0y3v/model.json
+ * v2: https://teachablemachine.withgoogle.com/models/SMAoTQVvW/model.json
+ * @type {string}
+ */
+const modelJson = 'https://teachablemachine.withgoogle.com/models/SMAoTQVvW/model.json';
 
 // Two variable to hold the label and confidence of the result
 let label;
@@ -26,6 +29,9 @@ let classifier;
 
 // Initialize the pause timeout
 let longPauseTimeout;
+
+// Min confidence to play an audio
+const confidenceThreshold = 0.95;
 
 let audioIn;
 
@@ -56,7 +62,28 @@ const actionMapping = {
  */
 function preload() {
   classifier = ml5.soundClassifier(modelJson, {
-    probabilityThreshold: 0.7 // probabilityThreshold is 0
+    /**
+     * Only results above the probabilityThreshold value will be trigger the gotResult callback.
+     */
+    probabilityThreshold: 0.8,
+
+    /**
+     * Whether to invoke the goResult callback on unknown input and background noise.
+     */
+    invokeCallbackOnNoiseAndUnknown: true,
+
+    /**
+     * The overlap factor determines how frequently the last second of audio is tested against the model you’ve made.
+     * With an overlap rate of 0, audio will be classified very second.
+     * With an overlap of 0.5, audio will be classified every half second.
+     * You probably want between 0.5 and 0.75. More info in README
+     */
+    overlapFactor: 0.8,
+
+    /**
+     * Include spectogram. Where?
+     */
+    includeSpectrogram: true
   });
 }
 
@@ -131,7 +158,8 @@ function selectAudioSource(index = 0) {
  * @param error
  * @param results
  */
-function gotResult(error, results) {
+function gotResult(error, results, asdf) {
+  console.log(asdf);
   // The results are in an array ordered by confidence.
   const {label, confidence} = results[0];
 
@@ -147,7 +175,6 @@ function gotResult(error, results) {
   longPauseTimeout = setTimeout(longPauseCallback, 7000);
 
   let action = 'Undefined input, do nothing.';
-  console.log(Object.keys(actionMapping), (label.toLowerCase()))
   if (confidence > confidenceThreshold && Object.keys(actionMapping).includes(label.toLowerCase())) {
     // action needed!
     const actions = actionMapping[label.toLowerCase()];
