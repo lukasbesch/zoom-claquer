@@ -20,6 +20,7 @@ let label;
 let confidence;
 let action;
 let audioSelect;
+let monitorBtn, monitor = false;
 // Initialize a sound classifier method.
 let classifier;
 
@@ -67,12 +68,6 @@ function setup() {
   // ml5 also supports using callback pattern to create the classifier
   // classifier = ml5.soundClassifier(modelJson, modelReady);
 
-  // sel.position(10, 10);
-  // sel.option('pear');
-  // sel.option('kiwi');
-  // sel.option('grape');
-  // sel.selected('kiwi');
-
   // Create 'label' and 'confidence' div to hold results
   label = createDiv('Label: ...');
   confidence = createDiv('Confidence: ...');
@@ -83,6 +78,10 @@ function setup() {
   // get the audio sources
   audioIn = new p5.AudioIn();
   audioIn.getSources(gotSources);
+
+  // monitor button
+  monitorBtn = createButton('Monitoring On/Off');
+  monitorBtn.mousePressed(setMonitoring);
 
   // setup basic input level indicator
   createCanvas(100, 100);
@@ -124,9 +123,6 @@ function selectAudioSource(index = 0) {
   // start listening to input
   audioIn.start();
   userStartAudio();
-
-  // monitor the output to the master output
-  audioIn.connect();
 }
 
 /**
@@ -159,6 +155,18 @@ function gotResult(error, results) {
     action = shuffleArray(actions)[0];
   }
   printResult(label, nf(confidence, 0, 2), action);  // Round the confidence to 0.01
+}
+
+/**
+ * Enables monitoring
+ */
+function setMonitoring() {
+  monitor = ! monitor;
+  if (monitor) {
+    audioIn.connect();
+  } else {
+    audioIn.disconnect();
+  }
 }
 
 function printResult(labelVal, confidenceVal, actionVal) {
