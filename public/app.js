@@ -25,28 +25,7 @@ let classifier;
 // Initialize the pause timeout
 let longPauseTimeout;
 
-function preload() {
-  // Load the pre-trianed custom SpeechCommands18w sound classifier model
-  classifier = ml5.soundClassifier(modelJson);
-}
-
-function setup() {
-  noCanvas();
-  // ml5 also supports using callback pattern to create the classifier
-  // classifier = ml5.soundClassifier(modelJson, modelReady);
-
-  // Create 'label' and 'confidence' div to hold results
-  label = createDiv('Label: ...');
-  confidence = createDiv('Confidence: ...');
-  action = createDiv('Action: ...');
-  // Classify the sound from microphone in real time
-  classifier.classify(gotResult);
-}
-
-// If you use callback pattern to create the classifier, you can use the following callback function
-// function modelReady() {
-//   classifier.classify(gotResult);
-// }
+let audioIn;
 
 const actionMapping = {
   bye: [
@@ -60,22 +39,83 @@ const actionMapping = {
   ]
 };
 
-const shuffleArray = arr => arr
-  .map(a => [Math.random(), a])
-  .sort((a, b) => a[0] - b[0])
-  .map(a => a[1]);
+/**
+ * Load the pre-trianed custom SpeechCommands18w sound classifier model.
+ */
+function preload() {
+  classifier = ml5.soundClassifier(modelJson);
+}
 
+/**
+ * Set up
+ */
+function setup() {
+  noCanvas();
+  // ml5 also supports using callback pattern to create the classifier
+  // classifier = ml5.soundClassifier(modelJson, modelReady);
 
-// A function to run when we get any errors and the results
+  // Create 'label' and 'confidence' div to hold results
+  label = createDiv('Label: ...');
+  confidence = createDiv('Confidence: ...');
+  action = createDiv('Action: ...');
+  // Classify the sound from microphone in real time
+  classifier.classify(gotResult);
+
+  // get the audio sources
+  audioIn = new p5.AudioIn();
+  audioIn.getSources(gotSources);
+
+  // setup basic input level indicator
+  createCanvas(100, 100);
+}
+
+/**
+ * Process the available audio sources.
+ *
+ * @param deviceList
+ */
+function gotSources(deviceList) {
+  if (deviceList.length < 0) {
+    console.log('No audio inputs available.');
+    return;
+  }
+
+  // Find the desired input source
+  const inputLabel = 'blackhole';
+  const input = deviceList
+    .findIndex(input => input.label.toLowerCase().includes(inputLabel));
+  if (! input) {
+    console.log(`Audio input ${inputLabel} is not available.`);
+    return;
+  }
+
+  // set the source
+  audioIn.setSource(input);
+  console.log(`set source to: ${deviceList[audioIn.currentSource].deviceId}`);
+
+  // start listening to input
+  audioIn.start();
+  userStartAudio();
+
+  // monitor the output to the master output
+  audioIn.connect();
+}
+
+/**
+ * Process a recognized speech command.
+ *
+ * @param error
+ * @param results
+ */
 function gotResult(error, results) {
+  // The results are in an array ordered by confidence.
   const {label, confidence} = results[0];
+  console.log(results);
 
   // Display error in the console
   if (error) {
     console.error(error);
   }
-  // The results are in an array ordered by confidence.
-  console.log(results);
 
   // got some input, reset the pause timeout
   clearTimeout(longPauseTimeout);
@@ -101,3 +141,22 @@ function longPauseCallback() {
   printResult('Long pause', 1, 'Do something?')
   // time for action
 }
+
+function draw() {
+  // draw the input level indicator
+  background(0);
+  fill(255);
+  const micLevel = audioIn.getLevel();
+  let y = 100 - micLevel * 100;
+  ellipse(width/2, y, 10, 10);
+}
+
+/**
+ * Gets a random item from an array.
+ * @param arr
+ * @returns {*}
+ */
+const shuffleArray = arr => arr
+  .map(a => [Math.random(), a])
+  .sort((a, b) => a[0] - b[0])
+  .map(a => a[1]);
