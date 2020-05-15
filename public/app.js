@@ -70,6 +70,17 @@ function setup() {
 }
 
 /**
+ * Render the input level indicator
+ */
+function draw() {
+  background(0);
+  fill(255);
+  const micLevel = audioIn.getLevel();
+  let y = 100 - micLevel * 100;
+  ellipse(width/2, y, 10, 10);
+}
+
+/**
  * Process the available audio sources.
  *
  * @param deviceList
@@ -141,22 +152,3 @@ function longPauseCallback() {
   printResult('Long pause', 1, 'Do something?')
   // time for action
 }
-
-function draw() {
-  // draw the input level indicator
-  background(0);
-  fill(255);
-  const micLevel = audioIn.getLevel();
-  let y = 100 - micLevel * 100;
-  ellipse(width/2, y, 10, 10);
-}
-
-/**
- * Gets a random item from an array.
- * @param arr
- * @returns {*}
- */
-const shuffleArray = arr => arr
-  .map(a => [Math.random(), a])
-  .sort((a, b) => a[0] - b[0])
-  .map(a => a[1]);
