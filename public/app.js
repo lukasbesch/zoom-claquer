@@ -29,6 +29,11 @@ let longPauseTimeout;
 
 let audioIn;
 
+const FOLDER = 'soundfiles/', EXT = '.wav',
+      INDEX_START = 1, INDEX_END = 2,
+      INDEX_TOTAL = 1 + INDEX_END - INDEX_START,
+      sounds = Array(INDEX_TOTAL);
+
 const actionMapping = {
   _background_noise_: [
     'do nothing'
@@ -51,22 +56,41 @@ const actionMapping = {
   ]
 };
 
-/**
- * Load the pre-trianed custom SpeechCommands18w sound classifier model.
- */
+
 function preload() {
+
+  /**
+   * Load the pre-trianed custom SpeechCommands18w sound classifier model.
+   */
+
   classifier = ml5.soundClassifier(modelJson, {
     probabilityThreshold: 0.7 // probabilityThreshold is 0
   });
-}
+
+  /**
+   * Load Sound Directory
+   */
+
+   for (let i = 0; i < INDEX_TOTAL; ++i){
+       sounds[i] = loadSound(FOLDER + (i + INDEX_START) + EXT);
+       console.log(i + INDEX_START + EXT);
+   }
+ }
+
 
 /**
  * Set up
  */
 function setup() {
-  noCanvas();
+  //noCanvas();
   // ml5 also supports using callback pattern to create the classifier
   // classifier = ml5.soundClassifier(modelJson, modelReady);
+
+  // sel.position(10, 10);
+  // sel.option('pear');
+  // sel.option('kiwi');
+  // sel.option('grape');
+  // sel.selected('kiwi');
 
   // Create 'label' and 'confidence' div to hold results
   label = createDiv('Label: ...');
@@ -79,12 +103,12 @@ function setup() {
   audioIn = new p5.AudioIn();
   audioIn.getSources(gotSources);
 
-  // monitor button
-  monitorBtn = createButton('Monitoring On/Off');
-  monitorBtn.mousePressed(setMonitoring);
-
   // setup basic input level indicator
-  createCanvas(100, 100);
+
+
+  createCanvas(300, 100);
+  //let canvasSound = createCanvas(300, 100);
+
 }
 
 /**
@@ -94,8 +118,10 @@ function draw() {
   background(0);
   fill(255);
   const micLevel = audioIn.getLevel();
+  console.log(micLevel*100);
   let y = 100 - micLevel * 100;
   ellipse(width/2, y, 10, 10);
+  //sounds[1].play();
 }
 
 /**
@@ -115,6 +141,7 @@ function gotSources(deviceList) {
   }
 
   selectAudioSource();
+
 }
 
 function selectAudioSource(index = 0) {
@@ -123,6 +150,9 @@ function selectAudioSource(index = 0) {
   // start listening to input
   audioIn.start();
   userStartAudio();
+
+  // monitor the output to the master output
+  audioIn.connect();
 }
 
 /**
@@ -144,7 +174,7 @@ function gotResult(error, results) {
 
   // got some input, reset the pause timeout
   clearTimeout(longPauseTimeout);
-  longPauseTimeout = setTimeout(longPauseCallback, 7000);
+  longPauseTimeout = setTimeout(longPauseCallback, 3000);
 
   let action = 'Undefined input, do nothing.';
   console.log(Object.keys(actionMapping), (label.toLowerCase()))
@@ -157,18 +187,6 @@ function gotResult(error, results) {
   printResult(label, nf(confidence, 0, 2), action);  // Round the confidence to 0.01
 }
 
-/**
- * Enables monitoring
- */
-function setMonitoring() {
-  monitor = ! monitor;
-  if (monitor) {
-    audioIn.connect();
-  } else {
-    audioIn.disconnect();
-  }
-}
-
 function printResult(labelVal, confidenceVal, actionVal) {
   label.html('Label: ' + labelVal);
   confidence.html('Confidence: ' + confidenceVal); // Round the confidence to 0.01
@@ -177,5 +195,6 @@ function printResult(labelVal, confidenceVal, actionVal) {
 
 function longPauseCallback() {
   printResult('Long pause', 1, 'Do something?')
+
   // time for action
 }
