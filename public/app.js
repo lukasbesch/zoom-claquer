@@ -35,10 +35,14 @@ const confidenceThreshold = 0.95;
 
 let audioIn;
 
+//const sounds = [];
+
+
 const FOLDER = 'soundfiles/', EXT = '.wav',
       INDEX_START = 1, INDEX_END = 2,
       INDEX_TOTAL = 1 + INDEX_END - INDEX_START,
       sounds = Array(INDEX_TOTAL);
+
 
 const actionMapping = {
   _background_noise_: [
@@ -51,7 +55,7 @@ const actionMapping = {
     // these are supposed to be audio files
     'Good bye',
     'See ya!',
-    'Thanks and until next time.'
+    'Thanks and until next time.',
   ],
   laughter: [
     'LOL',
@@ -102,6 +106,14 @@ function preload() {
        sounds[i] = loadSound(FOLDER + (i + INDEX_START) + EXT);
        console.log(i + INDEX_START + EXT);
    }
+
+/*
+   for (let i = 1; i < 5; i++) {
+     sounds.push(loadSound('data/' + i + '.wav'));
+   } */
+
+
+    //sounds.push(loadSound('bye/1.wav'));
  }
 
 
@@ -148,7 +160,6 @@ function draw() {
   console.log(micLevel*100);
   let y = 100 - micLevel * 100;
   ellipse(width/2, y, 10, 10);
-  //sounds[1].play();
 }
 
 /**
@@ -198,7 +209,9 @@ function gotResult(error, results, asdf) {
   // Display error in the console
   if (error) {
     console.error(error);
+    return;
   }
+
 
   // got some input, reset the pause timeout
   clearTimeout(longPauseTimeout);
@@ -212,6 +225,23 @@ function gotResult(error, results, asdf) {
     action = shuffleArray(actions)[0];
   }
   printResult(label, nf(confidence, 0, 2), action);  // Round the confidence to 0.01
+
+
+  if(label == "Laughter"){
+  		//sounds[0].play();
+      //sounds[1].play();
+      //sounds.play();
+  	}
+  	else if (label == "Bye"){
+  		sounds[1].play();
+  	}
+  		else if (label == "Conversation"){
+  		//sounds[1].play();
+  	}
+    else {
+
+  	}
+
 }
 
 function printResult(labelVal, confidenceVal, actionVal) {
@@ -221,7 +251,6 @@ function printResult(labelVal, confidenceVal, actionVal) {
 }
 
 function longPauseCallback() {
-  printResult('Long pause', 1, 'Do something?')
-
+  printResult('Long pause', 1, 'Do something?');
   // time for action
 }
