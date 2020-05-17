@@ -36,17 +36,20 @@ const confidenceThreshold = 0.95;
 let audioIn;
 
 //const sounds = [];
+let sound;
 
-
+var byeVoice = [];
+var laughterVoice = [];
+/*
 const FOLDER = 'soundfiles/', EXT = '.wav',
       INDEX_START = 1, INDEX_END = 2,
       INDEX_TOTAL = 1 + INDEX_END - INDEX_START,
       sounds = Array(INDEX_TOTAL);
 
-
+*/
 const actionMapping = {
   _background_noise_: [
-    'do nothing'
+    //'do nothing'
   ],
   conversation: [
     'do nothing'
@@ -60,9 +63,6 @@ const actionMapping = {
   laughter: [
     'LOL',
     '(laughs)'
-  ],
-  applauding: [
-    'Nice!'
   ]
 };
 
@@ -102,18 +102,55 @@ function preload() {
    * Load Sound Directory
    */
 
+
+
+/*
    for (let i = 0; i < INDEX_TOTAL; ++i){
        sounds[i] = loadSound(FOLDER + (i + INDEX_START) + EXT);
        console.log(i + INDEX_START + EXT);
-   }
-
-/*
+   }*/
+   /*
    for (let i = 1; i < 5; i++) {
      sounds.push(loadSound('data/' + i + '.wav'));
-   } */
+   }
+   */
 
 
     //sounds.push(loadSound('bye/1.wav'));
+
+
+    //soundFormats('wav', 'mp3');
+    //sound = loadSound('soundfiles/1.wav');
+
+    /// Load Soundfiles Bye
+    laughterVoice.push(loadSound('soundfiles/bye/102003_robinhood76_01887-goodbye-spell.wav'));
+    laughterVoice.push(loadSound('soundfiles/bye/213286_aderumoro_goodbye-female-friendly.wav'));
+    laughterVoice.push(loadSound('soundfiles/bye/235107_reitanna_japanese-goodbye.wav'));
+    laughterVoice.push(loadSound('soundfiles/bye/323212_alivvie_goodbye.wav'));
+    laughterVoice.push(loadSound('soundfiles/bye/339159_girlhurl_see-you-soon.wav'));
+    laughterVoice.push(loadSound('soundfiles/bye/343893__reitanna__mmbye.wav'));
+    laughterVoice.push(loadSound('soundfiles/bye/376967_kathid_goodbye-high-quality.wav'));
+    laughterVoice.push(loadSound('soundfiles/bye/254289_411067_1475061_goodbye.wav'));
+    laughterVoice.push(loadSound('soundfiles/bye/417197_theliongirl10_me-saying-bye.wav'));
+    laughterVoice.push(loadSound('soundfiles/bye/44745_matteusnova_adios.wav'));
+    laughterVoice.push(loadSound('soundfiles/bye/505439_rugmoth_annoyed-goodbye.wav'));
+
+
+    /// Load Soundfiles – Laughter
+    laughterVoice.push(loadSound('soundfiles/laughter/100426_nfrae_idunno_01.wav'));
+    laughterVoice.push(loadSound('soundfiles/laughter/119450_lmbubec_girl-laugh.wav'));
+    laughterVoice.push(loadSound('soundfiles/laughter/16127_hanstimm_hanstimm-laughs-a1.wav'));
+    laughterVoice.push(loadSound('soundfiles/laughter/16131_hanstimm_hanstimm-laughs-a2.wav'));
+    laughterVoice.push(loadSound('soundfiles/laughter/169799_missozzy_female-laughing-01.wav'));
+    laughterVoice.push(loadSound('soundfiles/laughter/19151_fratz_laughing1.wav'));
+    laughterVoice.push(loadSound('soundfiles/laughter/198248_unfa_laughter-04.wav'));
+    laughterVoice.push(loadSound('soundfiles/laughter/254289_jagadamba_male-laugh-laughter.wav'));
+    laughterVoice.push(loadSound('soundfiles/laughter/341036_vikuserro_hehehe-laughter.wav'));
+    laughterVoice.push(loadSound('soundfiles/laughter/442597_mafon2_hysterical-laughter.wav'));
+    laughterVoice.push(loadSound('soundfiles/laughter/46599_dobroide_20080108-female-laughing-02.wav'));
+    laughterVoice.push(loadSound('soundfiles/laughter/467748_sgak_laughter.wav'));
+    laughterVoice.push(loadSound('soundfiles/laughter/475212_jodybruchon_voices-female-laughter-guffaw.wav'));
+
  }
 
 
@@ -121,6 +158,8 @@ function preload() {
  * Set up
  */
 function setup() {
+
+
   //noCanvas();
   // ml5 also supports using callback pattern to create the classifier
   // classifier = ml5.soundClassifier(modelJson, modelReady);
@@ -147,7 +186,6 @@ function setup() {
 
   createCanvas(300, 100);
   //let canvasSound = createCanvas(300, 100);
-
 }
 
 /**
@@ -177,9 +215,7 @@ function gotSources(deviceList) {
   if (deviceList.length < 0) {
     console.log('No audio inputs available.');
   }
-
   selectAudioSource();
-
 }
 
 function selectAudioSource(index = 0) {
@@ -200,7 +236,7 @@ function selectAudioSource(index = 0) {
  * @param results
  */
 function gotResult(error, results, asdf) {
-  console.log(asdf);
+  //console.log(asdf);
   // The results are in an array ordered by confidence.
   const {label, confidence} = results[0];
 
@@ -211,7 +247,6 @@ function gotResult(error, results, asdf) {
     console.error(error);
     return;
   }
-
 
   // got some input, reset the pause timeout
   clearTimeout(longPauseTimeout);
@@ -228,21 +263,20 @@ function gotResult(error, results, asdf) {
 
 
   if(label == "Laughter"){
-  		//sounds[0].play();
-      //sounds[1].play();
-      //sounds.play();
+      random(laughterVoice).play();
   	}
+
   	else if (label == "Bye"){
-  		sounds[1].play();
+      random(byeVoice).play();
   	}
   		else if (label == "Conversation"){
-  		//sounds[1].play();
+
   	}
     else {
 
   	}
-
 }
+
 
 function printResult(labelVal, confidenceVal, actionVal) {
   label.html('Label: ' + labelVal);
