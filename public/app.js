@@ -23,7 +23,8 @@ let label;
 let confidence;
 let action;
 let audioSelect;
-let monitorBtn, monitor = false;
+let monitorBtn;
+let monitor = false;
 // Initialize a sound classifier method.
 let classifier;
 
@@ -103,8 +104,6 @@ function preload() {
    * Load Sound Directory
    */
 
-
-
 /*
    for (let i = 0; i < INDEX_TOTAL; ++i){
        sounds[i] = loadSound(FOLDER + (i + INDEX_START) + EXT);
@@ -116,12 +115,6 @@ function preload() {
    }
    */
 
-
-    //sounds.push(loadSound('bye/1.wav'));
-
-
-    //soundFormats('wav', 'mp3');
-    //sound = loadSound('soundfiles/1.wav');
 
     /// Load Soundfiles Bye
     byeVoice.push(loadSound('soundfiles/bye/102003_robinhood76_01887-goodbye-spell.wav'));
@@ -192,8 +185,8 @@ function setup() {
 
   createCanvas(300, 100);
   //let canvasSound = createCanvas(300, 100);
-  monitorBtn = createButton('Monitoring On/Off');
-  monitorBtn.mousePressed(setMonitoring);
+  monitorBtn = createCheckbox('Monitoring On/Off', false);
+  monitorBtn.changed(setMonitoring);
 
 }
 
@@ -202,9 +195,15 @@ function setup() {
  */
 function draw() {
   background(0, 15);
-  fill(255);
   noStroke();
-  drawFTT();
+
+  if(monitor == true){
+    fill(255);
+    drawFTT();
+	}
+	else {
+		fill(0);
+	}
 }
 
 
@@ -259,7 +258,7 @@ function gotResult(error, results, asdf) {
 
   // got some input, reset the pause timeout
   clearTimeout(longPauseTimeout);
-  longPauseTimeout = setTimeout(longPauseCallback, 3000);
+  longPauseTimeout = setTimeout(longPauseCallback, 7000);
 
   let action = 'Undefined input, do nothing.';
   if (confidence > confidenceThreshold && Object.keys(actionMapping).includes(label.toLowerCase())) {
@@ -288,13 +287,14 @@ function gotResult(error, results, asdf) {
  */
 function setMonitoring() {
   monitor = ! monitor;
-  console.log('monitor:' + monitor)
-  if (monitor) {
+  if (this.checked()) {
     audioIn.connect();
   } else {
     audioIn.disconnect();
   }
+  console.log('monitor:' + monitor);
 }
+
 
 /**
  * Drawing Mic Input as FTT
@@ -318,4 +318,5 @@ function printResult(labelVal, confidenceVal, actionVal) {
 function longPauseCallback() {
   printResult('Long pause', 1, 'Do something?');
   // time for action
+  console.log('Long pause', 1, 'Do something?');
 }
