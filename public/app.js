@@ -34,6 +34,7 @@ let longPauseTimeout;
 const confidenceThreshold = 0.95;
 
 let audioIn;
+let fft;
 
 //const sounds = [];
 let sound;
@@ -123,17 +124,17 @@ function preload() {
     //sound = loadSound('soundfiles/1.wav');
 
     /// Load Soundfiles Bye
-    laughterVoice.push(loadSound('soundfiles/bye/102003_robinhood76_01887-goodbye-spell.wav'));
-    laughterVoice.push(loadSound('soundfiles/bye/213286_aderumoro_goodbye-female-friendly.wav'));
-    laughterVoice.push(loadSound('soundfiles/bye/235107_reitanna_japanese-goodbye.wav'));
-    laughterVoice.push(loadSound('soundfiles/bye/323212_alivvie_goodbye.wav'));
-    laughterVoice.push(loadSound('soundfiles/bye/339159_girlhurl_see-you-soon.wav'));
-    laughterVoice.push(loadSound('soundfiles/bye/343893__reitanna__mmbye.wav'));
-    laughterVoice.push(loadSound('soundfiles/bye/376967_kathid_goodbye-high-quality.wav'));
-    laughterVoice.push(loadSound('soundfiles/bye/254289_411067_1475061_goodbye.wav'));
-    laughterVoice.push(loadSound('soundfiles/bye/417197_theliongirl10_me-saying-bye.wav'));
-    laughterVoice.push(loadSound('soundfiles/bye/44745_matteusnova_adios.wav'));
-    laughterVoice.push(loadSound('soundfiles/bye/505439_rugmoth_annoyed-goodbye.wav'));
+    byeVoice.push(loadSound('soundfiles/bye/102003_robinhood76_01887-goodbye-spell.wav'));
+    byeVoice.push(loadSound('soundfiles/bye/213286_aderumoro_goodbye-female-friendly.wav'));
+    byeVoice.push(loadSound('soundfiles/bye/235107_reitanna_japanese-goodbye.wav'));
+    byeVoice.push(loadSound('soundfiles/bye/323212_alivvie_goodbye.wav'));
+    byeVoice.push(loadSound('soundfiles/bye/339159_girlhurl_see-you-soon.wav'));
+    byeVoice.push(loadSound('soundfiles/bye/343893__reitanna__mmbye.wav'));
+    byeVoice.push(loadSound('soundfiles/bye/376967_kathid_goodbye-high-quality.wav'));
+    byeVoice.push(loadSound('soundfiles/bye/411067_1475061_goodbye.wav'));
+    byeVoice.push(loadSound('soundfiles/bye/417197_theliongirl10_me-saying-bye.wav'));
+    byeVoice.push(loadSound('soundfiles/bye/44745_matteusnova_adios.wav'));
+    byeVoice.push(loadSound('soundfiles/bye/505439_rugmoth_annoyed-goodbye.wav'));
 
 
     /// Load Soundfiles – Laughter
@@ -180,25 +181,33 @@ function setup() {
   // get the audio sources
   audioIn = new p5.AudioIn();
   audioIn.getSources(gotSources);
+  audioIn.start();
+
+  fft = new p5.FFT();
+  fft.setInput(audioIn);
+
 
   // setup basic input level indicator
 
 
   createCanvas(300, 100);
   //let canvasSound = createCanvas(300, 100);
+  monitorBtn = createButton('Monitoring On/Off');
+  monitorBtn.mousePressed(setMonitoring);
+
 }
 
 /**
  * Render the input level indicator
  */
 function draw() {
-  background(0);
+  background(0, 15);
   fill(255);
-  const micLevel = audioIn.getLevel();
-  console.log(micLevel*100);
-  let y = 100 - micLevel * 100;
-  ellipse(width/2, y, 10, 10);
+  noStroke();
+  drawFTT();
 }
+
+
 
 /**
  * Process the available audio sources.
@@ -263,20 +272,42 @@ function gotResult(error, results, asdf) {
 
 
   if(label == "Laughter"){
-      random(laughterVoice).play();
-  	}
+    random(laughterVoice).play();
+  }
 
-  	else if (label == "Bye"){
-      random(byeVoice).play();
-  	}
-  		else if (label == "Conversation"){
+  else if (label == "Bye"){
+    random(byeVoice).play();
+  }
 
-  	}
-    else {
-
-  	}
+  else {
+  }
 }
 
+/**
+ * Enables monitoring
+ */
+function setMonitoring() {
+  monitor = ! monitor;
+  console.log('monitor:' + monitor)
+  if (monitor) {
+    audioIn.connect();
+  } else {
+    audioIn.disconnect();
+  }
+}
+
+/**
+ * Drawing Mic Input as FTT
+ */
+
+function drawFTT() {
+  let spectrum = fft.analyze();
+  for (let i = 0; i < spectrum.length; i++) {
+    let x = map(i, 0, spectrum.length, 0, width);
+    let y = map(spectrum[i], 0, 255, height, 0);
+    ellipse(x, y, 1, 1);
+  }
+}
 
 function printResult(labelVal, confidenceVal, actionVal) {
   label.html('Label: ' + labelVal);
