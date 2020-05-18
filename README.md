@@ -57,7 +57,7 @@ The setup should be as simple and lightweight as possible. For implementation we
  
 You can access through the following link you can just use our preset:
  
-→ Quick Start: [Codesandbox.io](http://codesandbox.io)
+→ Quick Start: [https://codesandbox.io/s/github/lukasbesch/zoom-claquer](https://codesandbox.io/s/github/lukasbesch/zoom-claquer)
  
 → GitHub-Repository: [https://github.com/lukasbesch/zoom-claquer](https://github.com/lukasbesch/zoom-claquer)
 
@@ -69,7 +69,8 @@ cd zoom-claquer
 yarn start
 ```
 
-Access the interface at http://127.0.0.1:8080
+Access the interface at http://127.0.0.1:8080 (or the URL shown in Codesandbox)
+If you use Codesandbox, it is recommended to open the URL in a new window.
  
  
 ### Step 03: Implement into Zoom meeting
