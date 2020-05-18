@@ -54,13 +54,13 @@ The setup should be as simple and lightweight as possible. For implementation we
 [ml5.js](https://ml5js.org/) aims to make machine learning approachable for a broad audience of artists, creative coders, and students. The library provides access to machine learning algorithms and models in the browser, building on top of [TensorFlow.js](https://www.tensorflow.org/js) with no other external dependencies.
  
 [teachable machine by google](https://teachablemachine.withgoogle.com/) is a web-based tool that makes creating low-level machine learning models fast, easy, and accessible to everyone.
- 
+
+#### Quick start
 You can access through the following link you can just use our preset:
  
-→ Quick Start: [https://codesandbox.io/s/github/lukasbesch/zoom-claquer](https://codesandbox.io/s/github/lukasbesch/zoom-claquer)
- 
-→ GitHub-Repository: [https://github.com/lukasbesch/zoom-claquer](https://github.com/lukasbesch/zoom-claquer)
+[![Edit zoom-claquer](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/lukasbesch/zoom-claquer/tree/master/?fontsize=14&hidenavigation=1&theme=dark)
 
+#### Use the repository
 You need to install [Yarn](https://yarnpkg.com/) first.
 
 ```bash
@@ -69,8 +69,7 @@ cd zoom-claquer
 yarn start
 ```
 
-Access the interface at http://127.0.0.1:8080 (or the URL shown in Codesandbox)
-If you use Codesandbox, it is recommended to open the URL in a new window.
+You can now access the interface at http://127.0.0.1:8080.
  
  
 ### Step 03: Implement into Zoom meeting
