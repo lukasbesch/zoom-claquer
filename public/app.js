@@ -24,7 +24,7 @@ let confidence;
 let action;
 let audioSelect;
 let monitorBtn;
-let monitor = false;
+let monitor = true;
 // Initialize a sound classifier method.
 let classifier;
 
@@ -39,6 +39,21 @@ let fft;
 
 //const sounds = [];
 let sound;
+
+const timer = {
+  delay: 7000,
+  start: null,
+  stop: null
+};
+
+let trebHist = []; // to hold getEnergy("treble")
+let midHist = []; // to hold getEnergy("mid")
+let bassHist = []; // to hold getEnergy("bass")
+
+let trebEnergy, midEnergy, bassEnergy;
+let energyHist = [trebHist, midHist, bassHist]; // to hold all getEnergy() levels
+
+
 
 var byeVoice = [];
 var laughterVoice = [];
@@ -174,7 +189,7 @@ function setup() {
   // get the audio sources
   audioIn = new p5.AudioIn();
   audioIn.getSources(gotSources);
-  audioIn.start();
+  //audioIn.start();
 
   fft = new p5.FFT();
   fft.setInput(audioIn);
@@ -183,9 +198,9 @@ function setup() {
   // setup basic input level indicator
 
 
-  createCanvas(300, 100);
+  createCanvas(400, 100);
   //let canvasSound = createCanvas(300, 100);
-  monitorBtn = createCheckbox('Monitoring On/Off', false);
+  monitorBtn = createCheckbox('Monitoring On/Off', true);
   monitorBtn.changed(setMonitoring);
 
 }
@@ -196,14 +211,17 @@ function setup() {
 function draw() {
   background(0, 15);
   noStroke();
-
-  if(monitor == true){
-    fill(255);
+  fill(255);
+  if(monitor == false){
+    fill(0);
+	}
+	else if (monitor == true){
+    analyzeEnergy();
     drawFTT();
 	}
-	else {
-		fill(0);
-	}
+
+
+
 }
 
 
@@ -257,8 +275,8 @@ function gotResult(error, results, asdf) {
   }
 
   // got some input, reset the pause timeout
-  clearTimeout(longPauseTimeout);
-  longPauseTimeout = setTimeout(longPauseCallback, 7000);
+  //clearTimeout(longPauseTimeout);
+  //longPauseTimeout = setTimeout(longPauseCallback, 7000);
 
   let action = 'Undefined input, do nothing.';
   if (confidence > confidenceThreshold && Object.keys(actionMapping).includes(label.toLowerCase())) {
@@ -266,20 +284,36 @@ function gotResult(error, results, asdf) {
     const actions = actionMapping[label.toLowerCase()];
     // play random audio
     action = shuffleArray(actions)[0];
+
+    if(label == "Laughter"){
+      random(laughterVoice).play();
+
+    }
+
+    else if (label == "Bye"){
+      random(byeVoice).play();
+
+    }
+
+    else if (label == "Conversation"){
+
+    }
+
+    else if (label == "_background_noise_"){
+      //random(byeVoice).play();
+      //longPauseTimeout = setTimeout(longPauseCallback, 7000);
+      //clearTimeout(longPauseTimeout);
+      //clearTimeout(longPauseTimeout);
+      timerTrigger();
+      console.log('timer: '+ timer);
+    }
+
+    else {
+
+    }
+
   }
   printResult(label, nf(confidence, 0, 2), action);  // Round the confidence to 0.01
-
-
-  if(label == "Laughter"){
-    random(laughterVoice).play();
-  }
-
-  else if (label == "Bye"){
-    random(byeVoice).play();
-  }
-
-  else {
-  }
 }
 
 /**
@@ -305,14 +339,39 @@ function drawFTT() {
   for (let i = 0; i < spectrum.length; i++) {
     let x = map(i, 0, spectrum.length, 0, width);
     let y = map(spectrum[i], 0, 255, height, 0);
-    ellipse(x, y, 1, 1);
+    ellipse(x, y, 3, 3);
   }
+}
+
+function analyzeEnergy() {
+  trebEnergy = fft.getEnergy("treble");
+  midEnergy= fft.getEnergy("mid");
+  bassEnergy = fft.getEnergy("bass");
+
+  trebHist.push(trebEnergy);
+  midHist.push(midEnergy);
+  bassHist.push(bassEnergy);
+
+  if (bassEnergy < 96) {
+    console.log('Silence');
+  }
+
+  return bassEnergy;
 }
 
 function printResult(labelVal, confidenceVal, actionVal) {
   label.html('Label: ' + labelVal);
   confidence.html('Confidence: ' + confidenceVal); // Round the confidence to 0.01
   action.html('Action: ' + actionVal); // Round the confidence to 0.01
+}
+
+function timerTrigger() {
+  timer.start = int(millis());
+  timer.stop = timer.start + timer.delay;
+}
+
+function runTimer() {
+  return timer.stop > int(millis());
 }
 
 function longPauseCallback() {
