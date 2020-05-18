@@ -60,6 +60,8 @@ You can access through the following link you can just use our preset:
  
 [![Edit zoom-claquer](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/lukasbesch/zoom-claquer/tree/master/?fontsize=14&hidenavigation=1&theme=dark)
 
+Make sure to open the app url in a new window to avoid errors.
+
 #### Use the repository
 You need to install [Yarn](https://yarnpkg.com/) first.
 
