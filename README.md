@@ -84,4 +84,4 @@ Enable monitoring.
 optional: Create your own model with teachable machine
 
 
-Project for [KISD](https://kisd.de/) by [Lukas Besch](https://lukasbesch.com) & Jannik Busmann
+Project for [Köln International School of Design](https://kisd.de/) by [Jannik Bussmann](https://jannikbussmann.de/) & [Lukas Besch](https://lukasbesch.com)
